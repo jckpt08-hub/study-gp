@@ -1,0 +1,1440 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#070A12" />
+  <title>Study Grand Prix</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <style>
+    :root{
+      --bg:#050714;
+      --panel:#0b1026;
+      --panel2:#0a0f22;
+      --text:#e9edff;
+      --muted:#9aa3c7;
+      --danger:#ff3b5c;
+      --ok:#31e981;
+      --warn:#ffd166;
+
+      --merc:#2fe6ff;     /* cyan */
+      --ferr:#ff3b30;     /* red */
+      --mcl:#ff8a00;      /* orange */
+      --rb:#b25bff;       /* purple */
+      --cad:#0f0f14;      /* cadillac black */
+
+      --shadow: 0 16px 50px rgba(0,0,0,.45);
+      --radius: 18px;
+      --radius2: 26px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 700px at 20% -10%, rgba(55,120,255,.25), transparent 60%),
+        radial-gradient(900px 600px at 100% 0%, rgba(178,91,255,.18), transparent 55%),
+        radial-gradient(900px 700px at 40% 120%, rgba(47,230,255,.12), transparent 60%),
+        linear-gradient(180deg, #050714 0%, #040512 55%, #02020b 100%);
+      overflow-x:hidden;
+    }
+
+    .app{
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 16px 16px 28px;
+    }
+
+    /* Top bar */
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding: 10px 6px 6px;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width: 0;
+    }
+    .logo{
+      width:42px;height:42px;
+      border-radius:14px;
+      background:
+        radial-gradient(18px 18px at 30% 30%, rgba(255,255,255,.25), transparent 60%),
+        linear-gradient(135deg, rgba(47,230,255,.75), rgba(178,91,255,.75));
+      box-shadow: 0 10px 25px rgba(47,230,255,.15), 0 10px 30px rgba(178,91,255,.12);
+      position:relative;
+      overflow:hidden;
+    }
+    .logo:after{
+      content:"";
+      position:absolute;
+      inset:-20%;
+      background: linear-gradient(120deg, transparent 35%, rgba(255,255,255,.22), transparent 65%);
+      transform: translateX(-40%) rotate(10deg);
+      animation: sheen 4.5s ease-in-out infinite;
+    }
+    @keyframes sheen{
+      0%{transform:translateX(-60%) rotate(10deg); opacity:.2}
+      45%{opacity:.35}
+      100%{transform:translateX(60%) rotate(10deg); opacity:.2}
+    }
+    .brand h1{
+      margin:0;
+      font-size: 16px;
+      letter-spacing:.3px;
+      font-weight: 760;
+      line-height:1.1;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .sub{
+      margin:0;
+      font-size: 12px;
+      color:var(--muted);
+      letter-spacing:.2px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .actions{
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    .iconbtn{
+      border:none;
+      background: rgba(255,255,255,.06);
+      color:var(--text);
+      border-radius: 14px;
+      padding: 10px 12px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      cursor:pointer;
+      box-shadow: 0 10px 24px rgba(0,0,0,.18);
+      transition: transform .08s ease, background .2s ease;
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .iconbtn:active{ transform: translateY(1px) scale(.99); }
+    .iconbtn:hover{ background: rgba(255,255,255,.09); }
+    .icon{
+      width:18px;height:18px; display:inline-block;
+      opacity:.9;
+    }
+
+    /* Layout */
+    .grid{
+      display:grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap: 14px;
+      margin-top: 12px;
+    }
+    @media (max-width: 860px){
+      .grid{ grid-template-columns: 1fr; }
+    }
+
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: var(--radius2);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      position:relative;
+    }
+    .cardHeader{
+      padding: 14px 16px 10px;
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:10px;
+      background: linear-gradient(180deg, rgba(0,0,0,.18), transparent);
+    }
+    .cardHeader h2{
+      margin:0;
+      font-size: 14px;
+      letter-spacing:.22px;
+      font-weight: 760;
+    }
+    .badge{
+      font-size:12px;
+      color: var(--muted);
+      background: rgba(0,0,0,.25);
+      border:1px solid rgba(255,255,255,.08);
+      padding: 6px 10px;
+      border-radius: 999px;
+      white-space:nowrap;
+    }
+    .content{
+      padding: 12px 16px 16px;
+    }
+
+    /* Leaderboard */
+    .lbRow{
+      display:grid;
+      grid-template-columns: 44px 1fr 86px 90px;
+      align-items:center;
+      gap: 10px;
+      padding: 10px 10px;
+      border-radius: 16px;
+      background: rgba(0,0,0,.18);
+      border: 1px solid rgba(255,255,255,.06);
+      margin-bottom: 10px;
+      position:relative;
+      overflow:hidden;
+    }
+    .lbRow::before{
+      content:"";
+      position:absolute;
+      left:0; top:0; bottom:0;
+      width: 6px;
+      background: var(--team);
+      box-shadow: 0 0 16px rgba(255,255,255,.08);
+    }
+    .pos{
+      font-weight: 850;
+      font-size: 14px;
+      color: rgba(233,237,255,.95);
+      text-align:center;
+    }
+    .name{
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+      min-width:0;
+    }
+    .name strong{
+      font-size: 14px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .name span{
+      font-size: 11px;
+      color:var(--muted);
+      letter-spacing:.2px;
+    }
+    .pts{
+      text-align:right;
+      font-variant-numeric: tabular-nums;
+      font-weight: 780;
+    }
+    .gap{
+      text-align:right;
+      font-variant-numeric: tabular-nums;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .barWrap{
+      grid-column: 1 / -1;
+      height: 8px;
+      background: rgba(255,255,255,.06);
+      border-radius:999px;
+      overflow:hidden;
+      margin-top: 8px;
+      border:1px solid rgba(255,255,255,.06);
+    }
+    .bar{
+      height:100%;
+      width: 0%;
+      background: linear-gradient(90deg, rgba(255,255,255,.15), var(--team));
+      border-radius:999px;
+      transition: width .45s ease;
+    }
+
+    /* Control panel */
+    .hero{
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+    .bigTitle{
+      margin: 0;
+      font-size: 18px;
+      letter-spacing:.25px;
+      font-weight: 850;
+    }
+    .desc{
+      margin:0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.4;
+    }
+    .modePill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.22);
+      border:1px solid rgba(255,255,255,.09);
+      width: fit-content;
+      color: rgba(233,237,255,.9);
+      font-size: 12px;
+    }
+    .dot{
+      width:10px;height:10px;border-radius:999px;background: var(--ok);
+      box-shadow: 0 0 16px rgba(49,233,129,.25);
+    }
+    .dot.night{ background: var(--warn); box-shadow: 0 0 16px rgba(255,209,102,.22); }
+    .dot.theme{ background: var(--merc); box-shadow: 0 0 16px rgba(47,230,255,.20); }
+    .dot.finish{ background: #fff; box-shadow: 0 0 16px rgba(255,255,255,.16); }
+
+    .progressBox{
+      padding: 12px;
+      border-radius: var(--radius);
+      background: rgba(0,0,0,.2);
+      border:1px solid rgba(255,255,255,.08);
+    }
+    .progressMeta{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .track{
+      height: 10px;
+      border-radius:999px;
+      background: rgba(255,255,255,.08);
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.07);
+    }
+    .track > div{
+      height:100%;
+      width: 0%;
+      background: linear-gradient(90deg, rgba(47,230,255,.9), rgba(178,91,255,.9));
+      border-radius:999px;
+      transition: width .5s ease;
+    }
+
+    .btnRow{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .btn{
+      border:none;
+      cursor:pointer;
+      padding: 14px 14px;
+      border-radius: 18px;
+      font-weight: 860;
+      letter-spacing:.35px;
+      color: #0a0b12;
+      background: linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.75));
+      box-shadow: 0 16px 40px rgba(0,0,0,.35);
+      transition: transform .08s ease, filter .2s ease, opacity .2s ease;
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+      text-transform: uppercase;
+    }
+    .btn:active{ transform: translateY(1px) scale(.99); }
+    .btn.secondary{
+      background: rgba(255,255,255,.08);
+      color: var(--text);
+      border:1px solid rgba(255,255,255,.10);
+      box-shadow: none;
+    }
+    .btn.disabled{
+      opacity: .45;
+      pointer-events:none;
+      filter: grayscale(20%);
+    }
+
+    /* Theme buttons */
+    .themes{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .themeBtn{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+      text-align:left;
+      background: rgba(0,0,0,.18);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius: 18px;
+      padding: 12px 12px;
+      cursor:pointer;
+      transition: transform .08s ease, background .2s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .themeBtn:hover{ background: rgba(0,0,0,.24); }
+    .themeBtn:active{ transform: translateY(1px) scale(.995); }
+    .themeBtn strong{ font-size: 13px; letter-spacing:.2px; }
+    .themeBtn span{ font-size: 12px; color: var(--muted); }
+
+    /* Radio */
+    .radio{
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(0,0,0,.22), rgba(0,0,0,.12));
+      border: 1px solid rgba(255,255,255,.08);
+      position:relative;
+      overflow:hidden;
+    }
+    .radio:before{
+      content:"TEAM RADIO";
+      position:absolute;
+      right: 12px;
+      top: 10px;
+      font-size: 10px;
+      color: rgba(255,255,255,.22);
+      letter-spacing: 1px;
+      font-weight: 800;
+    }
+    .radio p{
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.35;
+      color: rgba(233,237,255,.92);
+    }
+    .radio p b{ color:#fff; }
+
+    /* Modal */
+    .modalBack{
+      position:fixed;
+      inset:0;
+      background: rgba(0,0,0,.62);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding: 18px;
+      z-index: 999;
+    }
+    .modal{
+      width: min(560px, 100%);
+      border-radius: 22px;
+      background: linear-gradient(180deg, rgba(11,16,38,.98), rgba(8,10,24,.98));
+      border:1px solid rgba(255,255,255,.10);
+      box-shadow: 0 24px 70px rgba(0,0,0,.55);
+      overflow:hidden;
+    }
+    .modalHead{
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .modalHead strong{ font-size: 13px; letter-spacing:.25px; }
+    .modalBody{ padding: 14px 16px 16px; }
+    label{
+      display:block;
+      font-size: 12px;
+      color: var(--muted);
+      margin: 10px 0 6px;
+    }
+    input, select{
+      width:100%;
+      padding: 12px 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.22);
+      color: var(--text);
+      font-size: 16px;
+      outline:none;
+    }
+    input:focus, select:focus{ border-color: rgba(47,230,255,.35); box-shadow: 0 0 0 4px rgba(47,230,255,.10); }
+    .modalBtns{
+      display:flex;
+      gap:10px;
+      margin-top: 12px;
+    }
+    .small{
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 8px;
+      line-height: 1.35;
+    }
+
+    /* Results podium */
+    .podium{
+      display:grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .pod{
+      padding: 12px;
+      border-radius: 20px;
+      background: rgba(0,0,0,.2);
+      border:1px solid rgba(255,255,255,.08);
+      position:relative;
+      overflow:hidden;
+    }
+    .pod::before{
+      content:"";
+      position:absolute;
+      inset:-40%;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.14), transparent 55%);
+      transform: rotate(15deg);
+    }
+    .pod h3{
+      position:relative;
+      margin:0;
+      font-size:12px;
+      color: rgba(255,255,255,.78);
+      letter-spacing:.8px;
+      text-transform:uppercase;
+    }
+    .pod strong{
+      position:relative;
+      display:block;
+      margin-top: 10px;
+      font-size: 15px;
+      letter-spacing:.2px;
+    }
+    .pod span{
+      position:relative;
+      display:block;
+      margin-top: 2px;
+      font-size: 12px;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .toast{
+      position: fixed;
+      left: 50%;
+      bottom: 16px;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,.55);
+      border: 1px solid rgba(255,255,255,.10);
+      color: rgba(233,237,255,.92);
+      padding: 10px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      box-shadow: 0 18px 55px rgba(0,0,0,.4);
+      display:none;
+      z-index: 9999;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div style="min-width:0">
+          <h1 id="topTitle">Study Grand Prix</h1>
+          <p class="sub" id="topSub">Choose a theme to start your GP.</p>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="iconbtn" id="penaltyBtn" title="Apply penalty to a driver">
+          <svg class="icon" viewBox="0 0 24 24" fill="none">
+            <path d="M6 21h12M9 21V9m6 12V9M8 9h8l-1-4H9L8 9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span style="font-size:12px;color:var(--muted);font-weight:700">Penalty</span>
+        </button>
+
+        <button class="iconbtn" id="trashBtn" title="Reset / delete all data">
+          <svg class="icon" viewBox="0 0 24 24" fill="none">
+            <path d="M9 3h6m-8 4h10m-9 0 1 16h6l1-16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <span style="font-size:12px;color:var(--muted);font-weight:700">Reset</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="grid">
+      <!-- Leaderboard -->
+      <div class="card">
+        <div class="cardHeader">
+          <h2>Live Leaderboard</h2>
+          <div class="badge" id="lbBadge">—</div>
+        </div>
+        <div class="content" id="leaderboard"></div>
+      </div>
+
+      <!-- Control Panel -->
+      <div class="card">
+        <div class="cardHeader">
+          <h2>Race Control</h2>
+          <div class="badge" id="modeBadge">MODE</div>
+        </div>
+        <div class="content">
+          <div class="hero">
+            <div class="modePill" id="modePill">
+              <span class="dot theme" id="modeDot"></span>
+              <span id="modeText">Theme Select</span>
+            </div>
+
+            <h3 class="bigTitle" id="panelTitle">Select the event</h3>
+            <p class="desc" id="panelDesc">Pick a Grand Prix theme (or Sprint). Leaderboard stays live at every stage.</p>
+
+            <div class="progressBox">
+              <div class="progressMeta">
+                <span id="lapText">Laps: 0 / 0</span>
+                <span id="gapText">Leader gap: —</span>
+              </div>
+              <div class="track"><div id="lapBar"></div></div>
+            </div>
+
+            <!-- Dynamic panel -->
+            <div id="panelArea"></div>
+
+            <div class="radio" id="radioBox">
+              <p id="radioLine"><b>Engineer:</b> Choose your event. We start the campaign today.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modalBack" id="modalBack">
+    <div class="modal">
+      <div class="modalHead">
+        <strong id="modalTitle">Input</strong>
+        <button class="iconbtn" id="modalClose" style="padding:8px 10px">
+          <span style="font-size:12px;color:var(--muted);font-weight:800">Close</span>
+        </button>
+      </div>
+      <div class="modalBody" id="modalBody"></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+/** =========================
+ *  Study Grand Prix (PWA)
+ *  10 drivers (Cadillac added)
+ *  Penalties (0.2/0.5/0.8)
+ *  Dynamic Team Radio
+ *  ========================= */
+
+const STORAGE_KEY = "study_gp_v2_10drivers";
+
+const THEMES = [
+  { id:"AUS", title:"1R Australian Grand Prix", subtitle:"Melbourne Grand Prix Circuit" },
+  { id:"CHN", title:"2R Chinese Grand Prix", subtitle:"Shanghai International Circuit" },
+  { id:"JPN", title:"3R Japanese Grand Prix", subtitle:"Suzuka Circuit" },
+  { id:"BHR", title:"4R Bahrain Grand Prix", subtitle:"Bahrain International Circuit" },
+  { id:"SAU", title:"5R Saudi Arabian Grand Prix", subtitle:"Jeddah Corniche Circuit" },
+  { id:"MIA", title:"6R Miami Grand Prix", subtitle:"Miami International Autodrome" },
+  { id:"SPR", title:"Sprint Race", subtitle:"Special sprint theme" }
+];
+
+const TEAMS = {
+  MERC: { name:"Mercedes", colorVar:"--merc" },
+  FERR: { name:"Ferrari",  colorVar:"--ferr" },
+  MCL:  { name:"McLaren",  colorVar:"--mcl"  },
+  RB:   { name:"Red Bull", colorVar:"--rb"   },
+  CAD:  { name:"Cadillac", colorVar:"--cad"  },
+};
+
+const DRIVERS = [
+  { id:"STU", name:"Stuart",     team:"MERC", user:true },
+  { id:"ANT", name:"Antonelli",  team:"MERC" },
+  { id:"LEC", name:"Leclerc",    team:"FERR" },
+  { id:"PIA", name:"Piastri",    team:"FERR" },
+  { id:"NOR", name:"Norris",     team:"MCL"  },
+  { id:"BEA", name:"Bearman",    team:"MCL"  },
+  { id:"VER", name:"Verstappen", team:"RB"   },
+  { id:"PER", name:"Perez",      team:"RB"   },
+  { id:"RUS", name:"Russell",    team:"CAD"  },
+  { id:"BOT", name:"Bottas",     team:"CAD"  },
+];
+
+// F1 top-10 points (perfect now that we have 10 drivers)
+const PTS_TABLE = [25,18,15,12,10,8,6,4,2,1];
+
+function nowISO(){
+  const d = new Date();
+  return d.toISOString().slice(0,19);
+}
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return null;
+    return JSON.parse(raw);
+  }catch(e){ return null; }
+}
+function saveState(state){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function defaultState(){
+  return {
+    version: 2,
+    stage: "theme",   // "theme" | "race" | "finished"
+    mode: "morning",  // "morning" | "night"
+    theme: null,
+    totalLaps: 0,
+    doneLaps: 0,
+    pendingLaps: null,
+    stintNo: 0,
+    createdAt: nowISO(),
+    lastUpdateAt: nowISO(),
+    points: Object.fromEntries(DRIVERS.map(d => [d.id, 0])),
+    log: []
+  };
+}
+
+function resetAll(){
+  localStorage.removeItem(STORAGE_KEY);
+  state = defaultState();
+  render();
+  toast("All data wiped. Back to theme select.");
+  radio("Engineer", pick(RADIO.reset));
+}
+
+/* Utils */
+function clamp(n, lo, hi){ return Math.max(lo, Math.min(hi, n)); }
+function randInt(lo, hi){ return Math.floor(Math.random()*(hi-lo+1))+lo; }
+function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+function fmt1(x){ return Number(x).toFixed(1); }
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, (m)=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[m]));
+}
+
+function interpolate(template, vars){
+  return template.replace(/\{(\w+)\}/g, (_,k)=> (vars[k] ?? `{${k}}`));
+}
+
+/* Tiny click beep */
+function clickBeep(){
+  try{
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type = "sine";
+    o.frequency.value = 880;
+    g.gain.value = 0.03;
+    o.connect(g); g.connect(ctx.destination);
+    o.start();
+    setTimeout(()=>{ o.frequency.value = 660; }, 50);
+    setTimeout(()=>{ o.stop(); ctx.close(); }, 120);
+  }catch(e){}
+}
+
+/* Radio system */
+const RADIO = {
+  theme: [
+    "Pick the venue. Same driver. New you.",
+    "Choose your event. Today we race the syllabus.",
+    "Select the track. Your rival is distraction — and we’re faster.",
+    "Theme first. Then we lock in laps and hunt points.",
+    "Sprint or Grand Prix — either way, we go for it."
+  ],
+  start: [
+    "Lights out soon. We build a championship one day at a time.",
+    "Okay. We’re live. One clean lap at a time, no heroics — just pace.",
+    "We’ve got a plan. Execute. Then improve. That’s how we win.",
+    "New GP. Fresh tyres. Fresh mindset.",
+    "Alright driver, show me what ‘consistency’ looks like."
+  ],
+  morning: [
+    "Morning briefing. Set today’s laps like you mean it.",
+    "Morning. Choose the distance. Then tonight we measure the pace.",
+    "Coffee is optional. Laps are not. Lock them in.",
+    "Morning mode: pick your laps — don’t negotiate with future-you.",
+    "Let’s set the stint. Make it realistic… but slightly ambitious."
+  ],
+  morningLocked: [
+    "Plan locked: <b>{laps}</b> laps. Tonight we cash it in.",
+    "Copy. <b>{laps}</b> laps on the board. Now we drive the day.",
+    "Locked. <b>{laps}</b> laps. If doubts appear, overtake them.",
+    "Good. <b>{laps}</b> laps. We’ll debrief tonight — bring pace.",
+    "Stint set: <b>{laps}</b> laps. You vs the grid."
+  ],
+  night: [
+    "Night debrief. Give me the number — honest pace, no excuses.",
+    "Night mode. Input the performance. The timing tower is hungry.",
+    "Alright. How did we drive today? 1–10. Be brave.",
+    "Night input time. Your score writes tomorrow’s confidence.",
+    "Okay driver. Rate the day. Then we see where we land."
+  ],
+  nightResult: [
+    "Stint complete. You finished <b>P{pos}</b>. Next: reset and plan the morning.",
+    "That’s the flag. <b>P{pos}</b> today. Learn it. Bank it. Improve it.",
+    "<b>P{pos}</b> for the stint. If you’re angry, good — channel it into pace.",
+    "We survived the chaos. <b>P{pos}</b>. Tomorrow we hunt higher.",
+    "Result in: <b>P{pos}</b>. Remember: champions are built on ordinary days."
+  ],
+  nightWin: [
+    "YES. Stint win. That’s <b>P1</b> energy. Don’t get cocky — get consistent.",
+    "Stint won. Timing tower looks good in your name.",
+    "P1. That’s not luck — that’s work. Same again tomorrow.",
+    "We win the stint. Keep the throttle pinned on the routine.",
+    "That’s a statement. P1. Now protect the lead with discipline."
+  ],
+  nightPodium: [
+    "Podium. <b>P{pos}</b>. Solid points. Now push for the top step.",
+    "P{pos}. Nice. You’re in the fight — don’t let go.",
+    "Podium day. Keep stacking them. Titles love consistency.",
+    "P{pos}. Good stint. Tomorrow: clean laps, higher ceiling.",
+    "P{pos}. Strong. We’re not here to participate — we’re here to win."
+  ],
+  nightLast: [
+    "P{pos}. Not ideal. But hey — tomorrow is an overtake opportunity.",
+    "We’re at P{pos}. Okay. We regroup. We come back swinging.",
+    "P{pos}. Painful. Use it. Fuel it. Next stint we respond.",
+    "That one hurt. P{pos}. But the race isn’t over — you’re still driving.",
+    "P{pos}. Bad day, not a bad driver. Reset tonight. Attack tomorrow."
+  ],
+  penalty: [
+    "Stewards decision: <b>{driver}</b> penalty <b>-{amt}p</b>. Timing tower updated.",
+    "Oof. Penalty applied to <b>{driver}</b>: <b>-{amt}p</b>. Keep it clean out there.",
+    "Race control note: <b>{driver}</b> gets <b>-{amt}p</b>. No further action.",
+    "Stewards have spoken. <b>{driver}</b> loses <b>{amt}p</b>. Brutal.",
+    "Penalty served: <b>{driver}</b> <b>-{amt}p</b>. Back to racing."
+  ],
+  finish: [
+    "Checkered flag. Championship math complete. Breathe — then choose the next GP.",
+    "That’s it. GP finished. Take the win (or the lesson) and go again.",
+    "Race complete. Results are final. Next event when you’re ready.",
+    "Flag’s out. The grid is done. Your grind continues — one GP at a time.",
+    "We’re done here. Good work. Now pick the next venue and repeat."
+  ],
+  reset: [
+    "Reset complete. Fresh tyres. Fresh brain.",
+    "All data wiped. New GP, new narrative.",
+    "Okay. Clean slate. Let’s rebuild the lead properly.",
+    "Wiped. No baggage. Only pace.",
+    "Reset done. Now we go again — smarter."
+  ],
+};
+
+function radio(speaker, line){
+  document.getElementById("radioLine").innerHTML = `<b>${speaker}:</b> ${line}`;
+}
+
+function radioCtx(context, vars={}){
+  const line = interpolate(pick(RADIO[context] || ["..."]), vars);
+  const speaker = (context === "penalty") ? "Stewards" : "Engineer";
+  radio(speaker, line);
+}
+
+/* Team colors */
+function teamColor(teamCode){
+  const v = TEAMS[teamCode].colorVar;
+  return getComputedStyle(document.documentElement).getPropertyValue(v).trim() || "#ffffff";
+}
+
+/* Sorting */
+function sortByPointsDesc(pmap){
+  return [...DRIVERS].sort((a,b)=>{
+    const pa = pmap[a.id] ?? 0;
+    const pb = pmap[b.id] ?? 0;
+    if(pb !== pa) return pb - pa;
+    return DRIVERS.findIndex(x=>x.id===a.id) - DRIVERS.findIndex(x=>x.id===b.id);
+  });
+}
+
+function leaderGapText(){
+  const order = sortByPointsDesc(state.points);
+  const p1 = order[0];
+  const p2 = order[1];
+  const gap = (state.points[p1.id] - state.points[p2.id]);
+  if(!isFinite(gap)) return "—";
+  return `+${fmt1(gap)} pts`;
+}
+
+function lapsProgressPct(){
+  if(!state.totalLaps) return 0;
+  return clamp((state.doneLaps / state.totalLaps)*100, 0, 100);
+}
+
+/* UI: Top */
+function setTopbar(){
+  const title = document.getElementById("topTitle");
+  const sub = document.getElementById("topSub");
+
+  if(state.stage === "theme"){
+    title.textContent = "Study Grand Prix";
+    sub.textContent = "Choose your event theme to start a new Grand Prix.";
+  }else{
+    const t = THEMES.find(x=>x.id===state.theme);
+    title.textContent = t ? t.title : "Study Grand Prix";
+    sub.textContent = t ? t.subtitle : "Grand Prix in progress";
+  }
+}
+
+function setModeUI(){
+  const modeBadge = document.getElementById("modeBadge");
+  const modeDot  = document.getElementById("modeDot");
+  const modeText = document.getElementById("modeText");
+
+  if(state.stage === "theme"){
+    modeBadge.textContent = "THEME";
+    modeDot.className = "dot theme";
+    modeText.textContent = "Theme Select";
+  } else if(state.stage === "finished"){
+    modeBadge.textContent = "FINISH";
+    modeDot.className = "dot finish";
+    modeText.textContent = "Checkered Flag";
+  } else {
+    const isNight = state.mode === "night";
+    modeBadge.textContent = isNight ? "NIGHT" : "MORNING";
+    modeDot.className = "dot " + (isNight ? "night" : "");
+    modeText.textContent = isNight ? "Night Input" : "Morning Plan";
+  }
+}
+
+function renderProgress(){
+  document.getElementById("lapText").textContent =
+    `Laps: ${state.doneLaps} / ${state.totalLaps || 0}`;
+  document.getElementById("gapText").textContent =
+    `Leader gap: ${state.totalLaps ? leaderGapText() : "—"}`;
+
+  document.getElementById("lapBar").style.width = lapsProgressPct().toFixed(1) + "%";
+
+  const lbBadge = document.getElementById("lbBadge");
+  if(state.stage === "theme"){
+    lbBadge.textContent = "Awaiting start";
+  } else if(state.stage === "finished"){
+    lbBadge.textContent = "Final classification";
+  } else {
+    const remaining = Math.max(0, state.totalLaps - state.doneLaps);
+    const pend = state.pendingLaps ? ` • Pending ${state.pendingLaps} laps` : "";
+    lbBadge.textContent = `${remaining} laps remaining${pend}`;
+  }
+}
+
+/* Leaderboard */
+function renderLeaderboard(){
+  const wrap = document.getElementById("leaderboard");
+  wrap.innerHTML = "";
+
+  const order = sortByPointsDesc(state.points);
+  const leaderPts = order.length ? (state.points[order[0].id] || 0) : 0;
+  const maxBar = Math.max(1, leaderPts);
+
+  order.forEach((d, idx) => {
+    const row = document.createElement("div");
+    row.className = "lbRow";
+    row.style.setProperty("--team", teamColor(d.team));
+
+    // make Cadillac stripe visible on dark bg by adding a subtle glow
+    if(d.team === "CAD"){
+      row.style.boxShadow = "0 12px 38px rgba(0,0,0,.35)";
+      row.style.borderColor = "rgba(255,255,255,.09)";
+    }
+
+    const pts = (state.points[d.id] || 0);
+    const gap = leaderPts - pts;
+
+    row.innerHTML = `
+      <div class="pos">P${idx+1}</div>
+      <div class="name">
+        <strong>${escapeHtml(d.name)}${d.user ? " (You)" : ""}</strong>
+        <span>${escapeHtml(TEAMS[d.team].name)}</span>
+      </div>
+      <div class="pts">${fmt1(pts)}</div>
+      <div class="gap">${idx===0 ? "LEADER" : `+${fmt1(gap)}`}</div>
+      <div class="barWrap"><div class="bar" style="width:${clamp((pts/maxBar)*100,0,100).toFixed(1)}%"></div></div>
+    `;
+    wrap.appendChild(row);
+  });
+}
+
+/* Panel text */
+function setPanel(textTitle, textDesc){
+  document.getElementById("panelTitle").innerHTML = textTitle;
+  document.getElementById("panelDesc").innerHTML = textDesc;
+}
+
+/** ===== Modal helpers ===== */
+const modalBack = document.getElementById("modalBack");
+const modalBody = document.getElementById("modalBody");
+const modalTitle = document.getElementById("modalTitle");
+
+document.getElementById("modalClose").addEventListener("click", ()=> closeModal());
+modalBack.addEventListener("click", (e)=>{ if(e.target === modalBack) closeModal(); });
+
+function openModal(title, bodyHTML){
+  modalTitle.textContent = title;
+  modalBody.innerHTML = bodyHTML;
+  modalBack.style.display = "flex";
+}
+function closeModal(){
+  modalBack.style.display = "none";
+  modalBody.innerHTML = "";
+}
+
+/** ===== Toast ===== */
+let toastTimer = null;
+function toast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.style.display = "block";
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>{ t.style.display = "none"; }, 1600);
+}
+
+/** ===== Race logic ===== */
+// performance -> pace with tiny noise
+function racePaceFromPerf(perf){
+  return perf + (Math.random()*0.7 - 0.35);
+}
+
+function beginGP(themeId, totalLaps){
+  state.stage = "race";
+  state.mode = "morning";
+  state.theme = themeId;
+  state.totalLaps = Math.max(1, totalLaps|0);
+  state.doneLaps = 0;
+  state.pendingLaps = null;
+  state.stintNo = 0;
+  state.points = Object.fromEntries(DRIVERS.map(d => [d.id, 0]));
+  state.log = [];
+  state.lastUpdateAt = nowISO();
+  saveState(state);
+  render();
+  radioCtx("start");
+  toast("GP started.");
+}
+
+function handleMorning(lapsToday){
+  const remaining = Math.max(0, state.totalLaps - state.doneLaps);
+  if(state.stage !== "race" || state.mode !== "morning") return;
+  if(remaining <= 0) return;
+
+  const laps = clamp(lapsToday|0, 1, remaining);
+  state.pendingLaps = laps;
+  state.mode = "night";
+  state.lastUpdateAt = nowISO();
+  saveState(state);
+  render();
+  radioCtx("morningLocked", { laps: String(laps) });
+  toast("Morning locked → Night mode");
+}
+
+function handleNight(stuartPerf){
+  if(state.stage !== "race" || state.mode !== "night") return;
+  if(!state.pendingLaps){
+    toast("No morning laps found.");
+    return;
+  }
+
+  const laps = state.pendingLaps;
+  const total = state.totalLaps;
+
+  // weights cause decimals: day points scale with how many laps the day represents
+  const weight = laps / total;
+
+  // generate perfs
+  const perf = {};
+  DRIVERS.forEach(d=>{
+    if(d.id === "STU"){
+      perf[d.id] = clamp(stuartPerf|0, 1, 10);
+    } else if(d.id === "VER"){
+      perf[d.id] = randInt(7,10);
+    } else {
+      perf[d.id] = randInt(3,10);
+    }
+  });
+
+  const pace = {};
+  DRIVERS.forEach(d => pace[d.id] = racePaceFromPerf(perf[d.id]));
+
+  const ranking = [...DRIVERS].sort((a,b)=> pace[b.id]-pace[a.id]);
+
+  // award weighted points
+  ranking.forEach((d, idx)=>{
+    const base = PTS_TABLE[idx] || 0;
+    state.points[d.id] = (state.points[d.id] || 0) + base * weight;
+  });
+
+  // progress laps
+  state.doneLaps += laps;
+  state.stintNo += 1;
+
+  // log
+  state.log.push({
+    t: nowISO(),
+    type: "stint",
+    stintNo: state.stintNo,
+    laps,
+    weight: +weight.toFixed(4),
+    perf,
+    ranking: ranking.map(d=>d.id)
+  });
+
+  // clear pending; check finish
+  state.pendingLaps = null;
+  const finished = state.doneLaps >= state.totalLaps;
+  state.stage = finished ? "finished" : "race";
+  state.mode = "morning";
+  state.lastUpdateAt = nowISO();
+  saveState(state);
+  render();
+
+  // Radio result flavor
+  const yourPos = ranking.findIndex(d=>d.id==="STU")+1;
+  if(yourPos === 1){
+    radioCtx("nightWin");
+  } else if(yourPos <= 3){
+    radioCtx("nightPodium", { pos: String(yourPos) });
+  } else if(yourPos === DRIVERS.length){
+    radioCtx("nightLast", { pos: String(yourPos) });
+  } else {
+    radioCtx("nightResult", { pos: String(yourPos) });
+  }
+
+  if(finished){
+    toast("🏁 GP finished!");
+    radioCtx("finish");
+  } else {
+    toast(`Night saved • P${yourPos} this stint`);
+  }
+}
+
+/** ===== Penalty ===== */
+function applyPenalty(driverId, amount){
+  if(!state.points || typeof state.points[driverId] !== "number"){
+    toast("No points data found.");
+    return;
+  }
+  const before = state.points[driverId];
+  const after = Math.max(0, before - amount);
+
+  state.points[driverId] = after;
+
+  state.log = state.log || [];
+  state.log.push({
+    t: nowISO(),
+    type: "penalty",
+    driverId,
+    amount,
+    before: +before.toFixed(3),
+    after: +after.toFixed(3)
+  });
+
+  state.lastUpdateAt = nowISO();
+  saveState(state);
+  render();
+
+  const d = DRIVERS.find(x=>x.id===driverId);
+  radioCtx("penalty", { driver: escapeHtml(d ? d.name : driverId), amt: fmt1(amount) });
+  toast(`Penalty: -${fmt1(amount)}p`);
+}
+
+/** ===== UI render (panel) ===== */
+function renderPanel(){
+  const panel = document.getElementById("panelArea");
+  panel.innerHTML = "";
+
+  if(state.stage === "theme"){
+    setPanel("Select the event", "Pick a Grand Prix theme (or Sprint). Leaderboard stays live at every stage.");
+    const themes = document.createElement("div");
+    themes.className = "themes";
+    THEMES.forEach(t=>{
+      const b = document.createElement("button");
+      b.className = "themeBtn";
+      b.innerHTML = `<strong>${escapeHtml(t.title)}</strong><span>${escapeHtml(t.subtitle)}</span>`;
+      b.addEventListener("click", ()=>{
+        clickBeep();
+        openModal("Start Grand Prix", `
+          <div>
+            <div class="badge" style="display:inline-flex;margin-bottom:10px">${escapeHtml(t.title)} • ${escapeHtml(t.subtitle)}</div>
+            <label>Total laps for this GP</label>
+            <input id="totalLapsInput" type="number" inputmode="numeric" min="1" max="999" placeholder="e.g., 50" />
+            <div class="small">This GP runs across real days. Each morning you assign laps for today. Each night you enter Stuart's performance.</div>
+            <div class="modalBtns">
+              <button class="btn secondary" id="cancelStart">Cancel</button>
+              <button class="btn" id="confirmStart">Start GP</button>
+            </div>
+          </div>
+        `);
+
+        setTimeout(()=>{
+          const inp = document.getElementById("totalLapsInput");
+          inp.value = "50";
+          inp.focus();
+          document.getElementById("cancelStart").onclick = ()=> closeModal();
+          document.getElementById("confirmStart").onclick = ()=>{
+            const laps = parseInt(inp.value || "50", 10);
+            closeModal();
+            beginGP(t.id, clamp(laps, 1, 999));
+          };
+        }, 0);
+      });
+      themes.appendChild(b);
+    });
+    panel.appendChild(themes);
+    radioCtx("theme");
+    return;
+  }
+
+  if(state.stage === "finished"){
+    setPanel("Final Classification", "Grand Prix complete. Review the podium, then return to theme select for the next event.");
+    const order = sortByPointsDesc(state.points);
+
+    const podium = document.createElement("div");
+    podium.className = "podium";
+    const p1 = order[0], p2 = order[1], p3 = order[2];
+
+    function podCard(pos, d){
+      const team = TEAMS[d.team];
+      const pts = state.points[d.id] || 0;
+      const div = document.createElement("div");
+      div.className = "pod";
+      div.innerHTML = `
+        <h3>P${pos}</h3>
+        <strong style="color:${teamColor(d.team)}">${escapeHtml(d.name)}${d.user ? " (You)" : ""}</strong>
+        <span>${escapeHtml(team.name)} • ${fmt1(pts)} pts</span>
+      `;
+      return div;
+    }
+    podium.appendChild(podCard(2,p2));
+    podium.appendChild(podCard(1,p1));
+    podium.appendChild(podCard(3,p3));
+
+    panel.appendChild(podium);
+
+    const btns = document.createElement("div");
+    btns.className = "btnRow";
+    btns.innerHTML = `
+      <button class="btn secondary" id="viewLog">Recap</button>
+      <button class="btn" id="backTheme">Next Event</button>
+    `;
+    panel.appendChild(btns);
+
+    document.getElementById("viewLog").onclick = ()=>{
+      clickBeep();
+      const lines = (state.log || []).slice().reverse().map(entry=>{
+        if(entry.type === "penalty"){
+          const d = DRIVERS.find(x=>x.id===entry.driverId);
+          return `STEWARD: ${d ? d.name : entry.driverId} penalty -${fmt1(entry.amount)}p • ${fmt1(entry.before)} → ${fmt1(entry.after)}`;
+        }
+        // stint
+        const rankNames = entry.ranking.map(id => DRIVERS.find(d=>d.id===id).name).join(" → ");
+        const you = entry.perf.STU;
+        return `Stint ${entry.stintNo}: ${entry.laps} laps (w=${entry.weight}) • You=${you} • Order: ${rankNames}`;
+      });
+
+      openModal("Recap Log", `
+        <div>
+          <div class="small">Most recent first.</div>
+          <div style="margin-top:10px; display:flex; flex-direction:column; gap:8px; max-height: 55vh; overflow:auto;">
+            ${lines.length ? lines.map(l=>`<div style="padding:10px;border-radius:16px;background:rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.08);font-size:12px;line-height:1.35">${escapeHtml(l)}</div>`).join("") : "<div class='small'>No entries recorded.</div>"}
+          </div>
+          <div class="modalBtns" style="margin-top:12px">
+            <button class="btn" id="closeRecap">Close</button>
+          </div>
+        </div>
+      `);
+      setTimeout(()=>{ document.getElementById("closeRecap").onclick = ()=> closeModal(); }, 0);
+    };
+
+    document.getElementById("backTheme").onclick = ()=>{
+      clickBeep();
+      state = defaultState();
+      saveState(state);
+      render();
+      radioCtx("theme");
+      toast("Ready for next GP");
+    };
+
+    return;
+  }
+
+  // stage === race
+  const t = THEMES.find(x=>x.id===state.theme);
+  const remaining = Math.max(0, state.totalLaps - state.doneLaps);
+
+  if(state.mode === "morning"){
+    setPanel("Morning Briefing", "Lock today's laps. Once you press MORNING, you must complete NIGHT to continue.");
+    const box = document.createElement("div");
+    box.innerHTML = `
+      <div class="btnRow">
+        <button class="btn" id="morningBtn">MORNING</button>
+        <button class="btn secondary disabled" id="nightBtn">NIGHT</button>
+      </div>
+      <div class="small">Remaining laps in this GP: <b>${remaining}</b>. Morning sets the stint length. Night logs your performance and simulates all drivers.</div>
+    `;
+    panel.appendChild(box);
+
+    document.getElementById("morningBtn").onclick = ()=>{
+      clickBeep();
+      openModal("Morning Mode", `
+        <div>
+          <div class="badge" style="display:inline-flex;margin-bottom:10px">${escapeHtml(t ? t.title : "Grand Prix")} • Morning</div>
+          <label>How many laps does TODAY represent?</label>
+          <input id="lapsToday" type="number" inputmode="numeric" min="1" max="${remaining}" placeholder="e.g., 5" />
+          <div class="small">This locks the stint. You cannot press MORNING again until NIGHT is completed.</div>
+          <div class="modalBtns">
+            <button class="btn secondary" id="cancelM">Cancel</button>
+            <button class="btn" id="confirmM">Lock Laps</button>
+          </div>
+        </div>
+      `);
+      setTimeout(()=>{
+        const inp = document.getElementById("lapsToday");
+        inp.value = String(Math.min(5, Math.max(1, remaining)));
+        inp.focus();
+        document.getElementById("cancelM").onclick = ()=> closeModal();
+        document.getElementById("confirmM").onclick = ()=>{
+          const v = parseInt(inp.value || "1", 10);
+          closeModal();
+          handleMorning(v);
+        };
+      }, 0);
+    };
+
+    radioCtx("morning");
+  } else {
+    setPanel("Night Debrief", `Stint locked: <b>${state.pendingLaps}</b> laps. Enter your performance to simulate the grid.`);
+    const box = document.createElement("div");
+    box.innerHTML = `
+      <div class="btnRow">
+        <button class="btn secondary disabled" id="morningBtn2">MORNING</button>
+        <button class="btn" id="nightBtn2">NIGHT</button>
+      </div>
+      <div class="small">Other drivers are randomized (3–10). Verstappen is randomized (7–10). Your score decides how hard you fight today.</div>
+    `;
+    panel.appendChild(box);
+
+    document.getElementById("nightBtn2").onclick = ()=>{
+      clickBeep();
+      openModal("Night Mode", `
+        <div>
+          <div class="badge" style="display:inline-flex;margin-bottom:10px">${escapeHtml(t ? t.title : "Grand Prix")} • Night</div>
+          <label>Stuart's performance (1–10)</label>
+          <input id="stuPerf" type="number" inputmode="numeric" min="1" max="10" placeholder="e.g., 8" />
+          <div class="small">This ends today’s stint and updates points + leaderboard. Then you return to Morning mode.</div>
+          <div class="modalBtns">
+            <button class="btn secondary" id="cancelN">Cancel</button>
+            <button class="btn" id="confirmN">Submit</button>
+          </div>
+        </div>
+      `);
+      setTimeout(()=>{
+        const inp = document.getElementById("stuPerf");
+        inp.value = "8";
+        inp.focus();
+        document.getElementById("cancelN").onclick = ()=> closeModal();
+        document.getElementById("confirmN").onclick = ()=>{
+          const v = parseInt(inp.value || "1", 10);
+          closeModal();
+          handleNight(v);
+        };
+      }, 0);
+    };
+
+    radioCtx("night");
+  }
+}
+
+/* Full render */
+function render(){
+  setTopbar();
+  setModeUI();
+  renderProgress();
+  renderLeaderboard();
+  renderPanel();
+}
+
+/** ===== Penalty button handler ===== */
+document.getElementById("penaltyBtn").addEventListener("click", ()=>{
+  clickBeep();
+
+  const options = DRIVERS.map(d => {
+    const pts = (state.points && typeof state.points[d.id] === "number") ? fmt1(state.points[d.id]) : "0.0";
+    return `<option value="${d.id}">${escapeHtml(d.name)}${d.user ? " (You)" : ""} — ${pts}p</option>`;
+  }).join("");
+
+  openModal("Stewards: Apply Penalty", `
+    <div>
+      <div class="small">Choose a driver and apply a points penalty. This updates standings instantly.</div>
+
+      <label>Driver</label>
+      <select id="penDriver">${options}</select>
+
+      <label>Penalty amount</label>
+      <div class="btnRow" style="grid-template-columns: 1fr 1fr 1fr;">
+        <button class="btn secondary" id="pen02">-0.2p</button>
+        <button class="btn secondary" id="pen05">-0.5p</button>
+        <button class="btn secondary" id="pen08">-0.8p</button>
+      </div>
+
+      <div class="modalBtns" style="margin-top:12px">
+        <button class="btn secondary" id="penCancel">Cancel</button>
+      </div>
+    </div>
+  `);
+
+  setTimeout(()=>{
+    const sel = document.getElementById("penDriver");
+    document.getElementById("penCancel").onclick = ()=> closeModal();
+
+    document.getElementById("pen02").onclick = ()=>{
+      closeModal();
+      applyPenalty(sel.value, 0.2);
+    };
+    document.getElementById("pen05").onclick = ()=>{
+      closeModal();
+      applyPenalty(sel.value, 0.5);
+    };
+    document.getElementById("pen08").onclick = ()=>{
+      closeModal();
+      applyPenalty(sel.value, 0.8);
+    };
+  }, 0);
+});
+
+/** ===== Reset button handler ===== */
+document.getElementById("trashBtn").addEventListener("click", ()=>{
+  clickBeep();
+  openModal("Reset all data?", `
+    <div>
+      <div class="small">This deletes the current GP, standings, and logs. You’ll return to theme selection.</div>
+      <div class="modalBtns" style="margin-top:12px">
+        <button class="btn secondary" id="cancelReset">Cancel</button>
+        <button class="btn" id="confirmReset" style="background: linear-gradient(180deg, rgba(255,59,92,.95), rgba(255,59,92,.75)); color:#13040b;">Delete</button>
+      </div>
+    </div>
+  `);
+  setTimeout(()=>{
+    document.getElementById("cancelReset").onclick = ()=> closeModal();
+    document.getElementById("confirmReset").onclick = ()=>{
+      closeModal();
+      resetAll();
+    };
+  }, 0);
+});
+
+/** ===== Boot ===== */
+let state = loadState() || defaultState();
+render();
+
+/** ===== PWA service worker ===== */
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js").catch(()=>{});
+  });
+}
+</script>
+</body>
+</html>
